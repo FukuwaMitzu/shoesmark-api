@@ -9,14 +9,14 @@ class ShoesFindAllOptions implements IFindAllOptions {
   limit: number;
   offset: number;
   ids: string[];
-  shoesName?:string;
+  shoesName?: string;
   categoryIds?: string[];
-  colorId?:string;
+  colorId?: string;
   price?: {
-    from: number,
-    to?: number
-  }
-  size?: number
+    from: number;
+    to?: number;
+  };
+  size?: number;
 }
 
 @Injectable()
@@ -28,25 +28,39 @@ export class ShoesService implements ICRUDService<Shoes> {
   async findById(id: string): Promise<Shoes> {
     return await this.shoesRepository.findOne({
       where: { shoesId: id },
-      relations: { brand: true, color: true, categories:true },
+      relations: { brand: true, color: true, categories: true },
     });
   }
   async findAll(options: ShoesFindAllOptions): Promise<[Shoes[], number]> {
-    const query = this.shoesRepository.createQueryBuilder("shoes");
-    query.leftJoinAndSelect("shoes.brand","brand")
-    .leftJoinAndSelect("shoes.color","color")
-    .leftJoinAndSelect("shoes.categories", "categories")
-    .skip(options.offset)
-    .take(options.limit);
-    if(options.ids)query.andWhereInIds(options.ids);
-    if(options.shoesName)query.andWhere("shoes.shoesName ILIKE :name", {name: `%${options.shoesName}%`});
-    if(options.categoryIds)query.andWhere("categories.categoryId IN (:...categoryIds)", {categoryIds: options.categoryIds});
-    if(options.colorId)query.andWhere("color.colorId = :colorId", {colorId: options.colorId});
-    if(options.price){
-      query.andWhere("shoes.price >= :fromPrice", {fromPrice: options.price.from});
-      if(options.price.to)query.andWhere("shoes.price <= :toPrice", {toPrice: options.price.to});
+    const query = this.shoesRepository.createQueryBuilder('shoes');
+    query
+      .leftJoinAndSelect('shoes.brand', 'brand')
+      .leftJoinAndSelect('shoes.color', 'color')
+      .leftJoinAndSelect('shoes.categories', 'categories')
+      .skip(options.offset)
+      .take(options.limit);
+    if (options.ids) query.andWhereInIds(options.ids);
+    if (options.shoesName)
+      query.andWhere('shoes.shoesName ILIKE :name', {
+        name: `%${options.shoesName}%`,
+      });
+    if (options.categoryIds)
+      query.andWhere('categories.categoryId IN (:...categoryIds)', {
+        categoryIds: options.categoryIds,
+      });
+    if (options.colorId)
+      query.andWhere('color.colorId = :colorId', { colorId: options.colorId });
+    if (options.price) {
+      query.andWhere('shoes.price >= :fromPrice', {
+        fromPrice: options.price.from,
+      });
+      if (options.price.to)
+        query.andWhere('shoes.price <= :toPrice', {
+          toPrice: options.price.to,
+        });
     }
-    if(options.size)query.andWhere("shoes.size = :size", {size: options.size});
+    if (options.size)
+      query.andWhere('shoes.size = :size', { size: options.size });
     return await query.getManyAndCount();
   }
   async update(value: Shoes): Promise<Shoes> {

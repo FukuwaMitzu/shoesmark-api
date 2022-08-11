@@ -15,7 +15,7 @@ export class AccessRequest {
 
   @Expose()
   @Type(() => Date)
-  exp: Date;
+  expiredAt: Date;
 }
 
 export const Access = createParamDecorator((data, ctx: ExecutionContext) => {

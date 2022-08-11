@@ -39,5 +39,5 @@ export class GetUserDto {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  fullName?:string;
+  fullName?: string;
 }

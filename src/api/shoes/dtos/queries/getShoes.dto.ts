@@ -13,17 +13,17 @@ import {
 } from 'class-validator';
 import { ColorIdMustExist } from 'src/api/color/validators/decorators/colorIdMustExist.decorator';
 
-class PriceFilter{
+class PriceFilter {
   @ApiProperty()
   @IsNumber()
   @Type(() => Number)
-  from: number
+  from: number;
 
   @ApiPropertyOptional()
   @IsNumber()
   @Type(() => Number)
   @IsOptional()
-  to?: number
+  to?: number;
 }
 
 export class GetShoesDto {
@@ -54,8 +54,7 @@ export class GetShoesDto {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  shoesName?:string;
-
+  shoesName?: string;
 
   @ApiPropertyOptional({
     isArray: true,
@@ -66,7 +65,6 @@ export class GetShoesDto {
   @IsOptional()
   categoryIds?: string[];
 
-
   @ApiPropertyOptional()
   @ColorIdMustExist()
   @IsUUID()
@@ -75,13 +73,13 @@ export class GetShoesDto {
 
   @ApiPropertyOptional()
   @IsNumber()
-  @Type(()=> Number)
+  @Type(() => Number)
   @IsOptional()
   size?: number;
 
   @ApiPropertyOptional()
   @ValidateNested()
-  @Type(()=> PriceFilter)
+  @Type(() => PriceFilter)
   @IsOptional()
-  price?: PriceFilter
+  price?: PriceFilter;
 }

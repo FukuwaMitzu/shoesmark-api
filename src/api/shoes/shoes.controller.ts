@@ -37,8 +37,18 @@ export class ShoesController {
 
   @Get()
   async getShoes(@Query() getShoesDto: GetShoesDto) {
-    const { limit, offset, ids, shoesName, categoryIds, colorId, price, size} = getShoesDto;
-    const data = await this.shoesService.findAll({ limit, offset, ids, shoesName, categoryIds, colorId, price, size });
+    const { limit, offset, ids, shoesName, categoryIds, colorId, price, size } =
+      getShoesDto;
+    const data = await this.shoesService.findAll({
+      limit,
+      offset,
+      ids,
+      shoesName,
+      categoryIds,
+      colorId,
+      price,
+      size,
+    });
     return new JsonCollection(data[0])
       .setLimit(limit)
       .setOffset(offset)
@@ -72,7 +82,7 @@ export class ShoesController {
     color.colorId = createShoesDto.colorId;
     shoes.color = color;
 
-    shoes.shoesImage = newPath.replace("\\", "/");
+    shoes.shoesImage = newPath.replace('\\', '/');
 
     shoes.categories = createShoesDto.categories.map((categoryId) =>
       plainToInstance(Category, { categoryId: categoryId }),
@@ -110,7 +120,7 @@ export class ShoesController {
       const newPath = file.path + '.' + fileType;
       fs.renameSync(file.path, newPath);
 
-      shoes.shoesImage = newPath.replace("\\", "/");
+      shoes.shoesImage = newPath.replace('\\', '/');
     }
     await this.shoesService.update(shoes);
     return new JsonEntity(shoes);

@@ -1,9 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { instanceToPlain } from 'class-transformer';
 import { isDefined } from 'class-validator';
+import { AES } from 'crypto-js';
+import * as dayjs from 'dayjs';
+import { Env } from 'src/shared/enums/Env.enum';
 import { ICRUDService } from 'src/shared/interfaces/ICRUDService.interface';
 import { IFindAllOptions } from 'src/shared/interfaces/IFindAllOptions.interface';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import { OrderSessionRequest } from './decoratos/orderSession.decorator';
 import { Order } from './entities/order.entity';
 import { OrderStatus } from './enums/orderStatus.enum';
 
@@ -46,7 +51,7 @@ export class OrderService implements ICRUDService<Order> {
   ): SelectQueryBuilder<Order> {
     const queryBD = this.orderRepository.createQueryBuilder('order');
     queryBD
-      .innerJoinAndSelect('order.owner', 'owner')
+      .leftJoinAndSelect('order.owner', 'owner')
       .leftJoinAndSelect('order.details', 'details')
       .leftJoinAndSelect('details.shoes', 'shoes')
       .addSelect(
@@ -112,5 +117,15 @@ export class OrderService implements ICRUDService<Order> {
     order.status = status;
     await this.update(order);
     return order;
+  }
+
+  async createOrderSessionToken(orderId: string) {
+    const orderSession = new OrderSessionRequest();
+    orderSession.orderId = orderId;
+    orderSession.expiredAt = dayjs().add(1, 'day').toDate();
+    return AES.encrypt(
+      JSON.stringify(instanceToPlain(orderSession)),
+      Env.MESSAGE_ENCRYPTION_KEY,
+    ).toString();
   }
 }

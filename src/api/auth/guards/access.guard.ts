@@ -5,11 +5,13 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { plainToInstance } from 'class-transformer';
 import { isDefined } from 'class-validator';
 import { AES, enc } from 'crypto-js';
 import * as dayjs from 'dayjs';
 import { Observable } from 'rxjs';
 import { Env } from 'src/shared/enums/Env.enum';
+import { AccessRequest } from '../decorators/access.decorator';
 import { AccessAction } from '../enums/activationAction.enum';
 
 @Injectable()
@@ -30,8 +32,9 @@ export class AccessGuard implements CanActivate {
       AES.decrypt(accessCode, Env.MESSAGE_ENCRYPTION_KEY).toString(enc.Utf8),
     );
     try {
-      if (dayjs(data.exp).isBefore(dayjs())) return false;
-      Object.assign(req, { access: data });
+      const accessRequest = plainToInstance(AccessRequest, data);
+      if (dayjs(accessRequest.expiredAt).isBefore(dayjs())) return false;
+      Object.assign(req, { access: accessRequest });
     } catch {
       throw new BadRequestException('Invalid access code');
     }

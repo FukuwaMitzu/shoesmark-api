@@ -50,7 +50,7 @@ export class ImportOrderController {
       limit,
       offset,
       ids,
-      creatorIds
+      creatorIds,
     });
     return new JsonCollection(data[0].map((data) => instanceToPlain(data)))
       .setLimit(limit)
@@ -156,7 +156,9 @@ export class ImportOrderController {
 
   @Delete()
   @Authenticate(Role.Admin, Role.Employee)
-  async deleteManyImportOrder(@Body() deleteManyImportOrderDto: DeleteManyImportOrderDto) {
+  async deleteManyImportOrder(
+    @Body() deleteManyImportOrderDto: DeleteManyImportOrderDto,
+  ) {
     await this.importOrderService.deleteMany(deleteManyImportOrderDto.ids);
     return new JsonAction();
   }

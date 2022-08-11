@@ -52,11 +52,10 @@ export class EditShoesDto {
   })
   @CategoryIdMustExist({ each: true })
   @Transform((data) => {
-    try{
+    try {
       return JSON.parse(data.value);
-    }
-    catch{
-      return data.value.split(",");
+    } catch {
+      return data.value.split(',');
     }
   })
   @IsArray()

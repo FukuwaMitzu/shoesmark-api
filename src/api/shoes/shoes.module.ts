@@ -7,7 +7,7 @@ import { ShoesController } from './shoes.controller';
   imports: [
     SharedShoesModule,
     MulterModule.register({
-      dest: "./uploads",
+      dest: './uploads',
       fileFilter: (req, file, callback) => {
         if (file.mimetype.match(/^image\/.*/i)) callback(null, true);
         else callback(new BadRequestException('File không hợp lệ'), false);

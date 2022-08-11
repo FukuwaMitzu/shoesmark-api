@@ -30,5 +30,4 @@ export class GetImportOrderDto {
   @IsUUID('all', { each: true })
   @IsOptional()
   creatorIds?: string[] = [];
-
 }

@@ -19,7 +19,6 @@ export class ImportOrderService implements ICRUDService<ImportOrder> {
     private readonly importOrderRepository: Repository<ImportOrder>,
   ) {}
   async findById(id: string): Promise<ImportOrder> {
-    
     return await this.importOrderRepository.findOne({
       where: { importOrderId: id },
       relations: {
@@ -33,16 +32,20 @@ export class ImportOrderService implements ICRUDService<ImportOrder> {
   async findAll(
     options: ImportOrderFindAllOptions,
   ): Promise<[ImportOrder[], number]> {
-    const queryBuilder = this.importOrderRepository.createQueryBuilder("importOrder");
-    queryBuilder.leftJoinAndSelect("importOrder.details", "details")
-    .leftJoinAndSelect("details.shoes", "shoes")
-    .leftJoinAndSelect("importOrder.creator", "creator")
-    .skip(options.offset)
-    .take(options.limit);
-    if(options.ids.length>0)queryBuilder.whereInIds(options.ids);
-    if(options.creatorIds.length>0)queryBuilder.andWhere("creator.userId IN (:...creatorIds)", {creatorIds: options.creatorIds});
+    const queryBuilder =
+      this.importOrderRepository.createQueryBuilder('importOrder');
+    queryBuilder
+      .leftJoinAndSelect('importOrder.details', 'details')
+      .leftJoinAndSelect('details.shoes', 'shoes')
+      .leftJoinAndSelect('importOrder.creator', 'creator')
+      .skip(options.offset)
+      .take(options.limit);
+    if (options.ids.length > 0) queryBuilder.whereInIds(options.ids);
+    if (options.creatorIds.length > 0)
+      queryBuilder.andWhere('creator.userId IN (:...creatorIds)', {
+        creatorIds: options.creatorIds,
+      });
     return await queryBuilder.getManyAndCount();
-
   }
   async update(value: ImportOrder): Promise<ImportOrder> {
     await this.importOrderRepository.save(value);

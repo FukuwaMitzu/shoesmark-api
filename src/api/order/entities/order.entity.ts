@@ -62,7 +62,7 @@ export class Order {
   orderPhoneNumber: string;
 
   @Expose()
-  @Column({nullable: true})
+  @Column({ nullable: true })
   orderEmail?: string;
 
   @Expose()
@@ -96,7 +96,7 @@ export class Order {
   details: OrderDetail[];
 
   @Expose()
-  @Column({nullable: true})
+  @Column({ nullable: true })
   onlinePaymentId?: string;
 
   @Expose()

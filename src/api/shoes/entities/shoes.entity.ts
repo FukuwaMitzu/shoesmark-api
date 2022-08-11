@@ -57,7 +57,7 @@ export class Shoes {
   color: Color;
 
   @Expose()
-  @Column({ type: 'decimal'})
+  @Column({ type: 'decimal' })
   size: number;
 
   @Expose()

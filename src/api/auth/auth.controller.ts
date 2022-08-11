@@ -20,7 +20,7 @@ import * as bcrypt from 'bcrypt';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthRequest } from './decorators/auth.decorator';
 import { JsonAction } from 'src/shared/JsonAction';
-import { RequireAction } from './decorators/requireAction';
+import { RequireAction } from './decorators/requireAction.decorator';
 import { AccessAction } from './enums/activationAction.enum';
 import { Access, AccessRequest } from './decorators/access.decorator';
 import { OtpDto } from './dtos/bodies/otp.dto';
@@ -51,7 +51,7 @@ export class AuthController {
     const newAccessCode = new AccessRequest();
     newAccessCode.action = activationCode.action;
     newAccessCode.email = activationCode.email;
-    newAccessCode.exp = dayjs().add(30, 'minutes').toDate();
+    newAccessCode.expiredAt = dayjs().add(30, 'minutes').toDate();
 
     return new JsonEntity({
       accessCode: AES.encrypt(
