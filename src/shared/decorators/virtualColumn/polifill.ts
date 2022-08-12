@@ -39,8 +39,8 @@ SelectQueryBuilder.prototype.getMany = async function () {
       });
 
       if (index != -1) entity[key] = raw[index][metaInfo['name']];
-      return entity;
     }
+    return entity;
   });
   return [...items];
 };

@@ -1,9 +1,11 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsEnum,
   IsNumber,
   IsOptional,
+  IsString,
   IsUUID,
   ValidateNested,
 } from 'class-validator';
@@ -64,6 +66,17 @@ export class GetOrderDto {
   @IsUUID('all', { each: true })
   @IsOptional()
   ownerIds?: string[] = [];
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @Type(() => Boolean)
+  @IsOptional()
+  onlyAnonymous?: boolean;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  fullName?: string;
 
   @ApiPropertyOptional({ type: OrderDto })
   @Type(() => OrderDto)

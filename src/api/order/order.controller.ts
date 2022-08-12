@@ -27,6 +27,7 @@ import {
 import { RequireOrderSession } from './decoratos/requireOrderSession.decorator';
 import { CreateOrderDto } from './dtos/bodies/createOrder.dto';
 import { CreateOrderDetailDto } from './dtos/bodies/createOrderDetail.dto';
+import { DeleteManyOrderDto } from './dtos/bodies/deleteManyOrder.dto';
 import { DeleteOrderDetailDto } from './dtos/bodies/deleteOrderDetail.dto';
 import { EditOrderDto } from './dtos/bodies/editOrder.decorator';
 import { EditOrderDetailDto } from './dtos/bodies/editOrderDetail.dto';
@@ -217,9 +218,18 @@ export class OrderController {
   @Get()
   @Authenticate(Role.Admin, Role.Employee)
   async getOrder(@Query() getOrderDto: GetOrderDto) {
-    const { limit, offset, ids, ownerIds, sortBy } = getOrderDto;
+    const { limit, offset, ids, ownerIds, onlyAnonymous, fullName, sortBy } =
+      getOrderDto;
     const data = await this.orderService
-      .getPreBuiltFindAllQuery({ limit, offset, ownerIds, ids, sortBy })
+      .getPreBuiltFindAllQuery({
+        limit,
+        offset,
+        ownerIds,
+        ids,
+        onlyAnonymous,
+        fullName,
+        sortBy,
+      })
       .getManyAndCount();
     return new JsonCollection(data[0])
       .setLimit(limit)
@@ -231,6 +241,14 @@ export class OrderController {
   @Authenticate(Role.Admin, Role.Employee)
   async deleteOrder(@Param() orderParamDto: OrderParamDto) {
     await this.orderService.deleteById(orderParamDto.id);
+    return new JsonAction();
+  }
+
+  //Xoá đơn hàng của admin
+  @Delete()
+  @Authenticate(Role.Admin, Role.Employee)
+  async deleteManyOrder(@Body() deleteManyOrder: DeleteManyOrderDto) {
+    await this.orderService.deleteMany(deleteManyOrder.ids);
     return new JsonAction();
   }
 

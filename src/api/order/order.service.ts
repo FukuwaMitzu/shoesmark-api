@@ -7,7 +7,7 @@ import * as dayjs from 'dayjs';
 import { Env } from 'src/shared/enums/Env.enum';
 import { ICRUDService } from 'src/shared/interfaces/ICRUDService.interface';
 import { IFindAllOptions } from 'src/shared/interfaces/IFindAllOptions.interface';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { OrderSessionRequest } from './decoratos/orderSession.decorator';
 import { Order } from './entities/order.entity';
 import { OrderStatus } from './enums/orderStatus.enum';
@@ -25,6 +25,8 @@ class OrderFindAllOptions implements IFindAllOptions {
   offset: number;
   ids: string[];
   ownerIds?: string[];
+  onlyAnonymous?: boolean;
+  fullName?: string;
   sortBy: OrderSortBy;
 }
 
@@ -107,7 +109,14 @@ export class OrderService implements ICRUDService<Order> {
         ownerIds: options.ownerIds,
       });
     if (options.ids.length > 0)
-      queryBD.where('order.orderId IN (:...ids)', { ids: options.ids });
+      queryBD.andWhere('order.orderId IN (:...ids)', { ids: options.ids });
+    if (options.onlyAnonymous === true) queryBD.andWhere('order.owner IS NULL');
+    if (options.fullName)
+      queryBD.andWhere(
+        "order.orderLastName || ' ' || order.orderFirstName ILIKE :fullName",
+        { fullName: `%${options.fullName}%` },
+      );
+
     return queryBD;
   }
 
@@ -120,6 +129,9 @@ export class OrderService implements ICRUDService<Order> {
   }
   async deleteById(id: string): Promise<void> {
     await this.orderRepository.delete({ orderId: id });
+  }
+  async deleteMany(ids: string[]): Promise<void> {
+    await this.orderRepository.delete({ orderId: In(ids) });
   }
   getRepository(): Repository<Order> {
     return this.orderRepository;
