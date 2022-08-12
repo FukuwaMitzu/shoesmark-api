@@ -25,7 +25,7 @@ export class User {
   })
   username: string;
 
-  @Column()
+  @Column({ select: false })
   @Expose({ toClassOnly: true })
   password: string;
 

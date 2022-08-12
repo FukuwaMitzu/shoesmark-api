@@ -96,9 +96,12 @@ export class AuthController {
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     const repository = this.userService.getRepository();
-    const user = await repository.findOne({
-      where: [{ username: loginDto.username }, { email: loginDto.email }],
-    });
+    const user = await repository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.username = :username', { username: loginDto.username })
+      .orWhere('user.email = :email', { email: loginDto.email })
+      .getOne();
     if (!isDefined(user))
       throw new BadRequestException('Tài khoản hoặc mật khẩu không hợp lệ');
     if (!(await bcrypt.compare(loginDto.password, user.password)))

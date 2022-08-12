@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Put,
   Query,
@@ -17,6 +18,7 @@ import { Authenticate } from '../auth/decorators/authenticate.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { CreateUserDto } from './dtos/bodies/createUser.dto';
 import { DeleteManyUserDto } from './dtos/bodies/deleteManyUser.dto';
+import { GetUserParamDto } from './dtos/params/getUserParam.dto';
 import { GetUserDto } from './dtos/queries/getUser.dto';
 import { UserExistDto } from './dtos/queries/userExist.dto';
 import { User } from './entities/user.entity';
@@ -48,6 +50,13 @@ export class UserController {
   async getMe(@Auth() auth: AuthRequest) {
     const user = await this.userService.findById(auth.userId);
     return new JsonEntity(user);
+  }
+
+  @Get(':id')
+  @Authenticate(Role.Admin, Role.Employee)
+  async getUserById(@Param() getUserParamDto: GetUserParamDto) {
+    const data = await this.userService.findById(getUserParamDto.id);
+    return new JsonEntity(data);
   }
 
   @Post()

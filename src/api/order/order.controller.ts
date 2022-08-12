@@ -236,6 +236,21 @@ export class OrderController {
       .setOffset(offset)
       .setTotal(data[1]);
   }
+
+  @Get(':id')
+  @Authenticate(Role.Admin, Role.Employee)
+  async getOrderById(@Param() orderParamDto: OrderParamDto) {
+    const data = await this.orderService
+      .getPreBuiltFindAllQuery({
+        ids: [orderParamDto.id],
+        limit: 32,
+        sortBy: {},
+        offset: 0,
+      })
+      .getManyAndCount();
+    return new JsonEntity(data[0][0]);
+  }
+
   //Xoá đơn hàng của admin
   @Delete(':id')
   @Authenticate(Role.Admin, Role.Employee)

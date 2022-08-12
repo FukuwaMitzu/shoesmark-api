@@ -104,7 +104,7 @@ export class OrderService implements ICRUDService<Order> {
           options.sortBy.gender == 'ASC' ? 'NULLS FIRST' : 'NULLS LAST',
         );
     }
-    if (options?.ownerIds.length > 0)
+    if (options.ownerIds?.length > 0)
       queryBD.andWhere('order.owner.userId IN (:...ownerIds)', {
         ownerIds: options.ownerIds,
       });
