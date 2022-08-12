@@ -57,19 +57,19 @@ export class Shoes {
   color: Color;
 
   @Expose()
-  @Column({ type: 'decimal' })
+  @Column({ type: 'decimal', precision: 5, scale: 2 })
   size: number;
 
   @Expose()
-  @Column({ type: 'decimal' })
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 
   @Expose()
-  @Column({ type: 'decimal' })
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   importPrice: number;
 
   @Expose()
-  @Column({ type: 'decimal' })
+  @Column({ type: 'decimal', precision: 5, scale: 2 })
   sale: number;
 
   @Expose()

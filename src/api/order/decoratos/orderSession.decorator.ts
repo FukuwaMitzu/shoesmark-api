@@ -1,11 +1,9 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { Exclude, Expose, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 
-@Exclude()
 export class OrderSessionRequest {
-  @Expose()
+  @Type(() => String)
   orderId: string;
-  @Expose()
   @Type(() => Date)
   expiredAt: Date;
 }

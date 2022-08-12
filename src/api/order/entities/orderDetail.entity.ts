@@ -35,12 +35,10 @@ export class OrderDetail {
   quantity: number;
 
   @Expose()
-  @Column()
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 
   @Expose()
-  @Column({
-    type: 'decimal',
-  })
+  @Column({ type: 'decimal', precision: 5, scale: 2 })
   sale: number;
 }

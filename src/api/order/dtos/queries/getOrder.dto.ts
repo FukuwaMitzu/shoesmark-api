@@ -57,6 +57,14 @@ export class GetOrderDto {
   @IsOptional()
   ids?: string[] = [];
 
+  @ApiPropertyOptional({
+    isArray: true,
+    name: 'ownerIds[]',
+  })
+  @IsUUID('all', { each: true })
+  @IsOptional()
+  ownerIds?: string[] = [];
+
   @ApiPropertyOptional({ type: OrderDto })
   @Type(() => OrderDto)
   @ValidateNested()

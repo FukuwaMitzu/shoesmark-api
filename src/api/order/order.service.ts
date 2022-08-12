@@ -24,6 +24,7 @@ class OrderFindAllOptions implements IFindAllOptions {
   limit: number;
   offset: number;
   ids: string[];
+  ownerIds?: string[];
   sortBy: OrderSortBy;
 }
 
@@ -54,12 +55,20 @@ export class OrderService implements ICRUDService<Order> {
       .leftJoinAndSelect('order.owner', 'owner')
       .leftJoinAndSelect('order.details', 'details')
       .leftJoinAndSelect('details.shoes', 'shoes')
-      .addSelect(
-        'COALESCE(SUM(details.quantity*details.price*(100-details.sale)/100), 0)',
-        'total_price',
-      )
-      .groupBy(
-        'order.orderId, owner.userId, details.orderId, details.shoesId, shoes.shoesId',
+      .leftJoinAndSelect(
+        (qb) =>
+          qb
+            .select()
+            .from(Order, 'suborder')
+            .leftJoin('suborder.details', 'subdetails')
+            .addSelect('suborder.orderId', 'suborderOrderId')
+            .addSelect(
+              'COALESCE(SUM(subdetails.quantity * subdetails.price *(100-subdetails.sale)/100), 0)',
+              'total_price',
+            )
+            .groupBy('suborder.orderId'),
+        'total',
+        '"suborderOrderId"=order.orderId',
       );
     if (isDefined(options.sortBy)) {
       if (isDefined(options.sortBy.dateCreated))
@@ -93,13 +102,17 @@ export class OrderService implements ICRUDService<Order> {
           options.sortBy.gender == 'ASC' ? 'NULLS FIRST' : 'NULLS LAST',
         );
     }
+    if (options?.ownerIds.length > 0)
+      queryBD.andWhere('order.owner.userId IN (:...ownerIds)', {
+        ownerIds: options.ownerIds,
+      });
     if (options.ids.length > 0)
       queryBD.where('order.orderId IN (:...ids)', { ids: options.ids });
     return queryBD;
   }
 
   async findAll(options: OrderFindAllOptions): Promise<[Order[], number]> {
-    return this.getPreBuiltFindAllQuery(options).getManyAndCount();
+    return await this.getPreBuiltFindAllQuery(options).getManyAndCount();
   }
   async update(value: Order): Promise<Order> {
     await this.orderRepository.save(value);

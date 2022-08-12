@@ -217,9 +217,9 @@ export class OrderController {
   @Get()
   @Authenticate(Role.Admin, Role.Employee)
   async getOrder(@Query() getOrderDto: GetOrderDto) {
-    const { limit, offset, ids, sortBy } = getOrderDto;
+    const { limit, offset, ids, ownerIds, sortBy } = getOrderDto;
     const data = await this.orderService
-      .getPreBuiltFindAllQuery({ limit, offset, ids, sortBy })
+      .getPreBuiltFindAllQuery({ limit, offset, ownerIds, ids, sortBy })
       .getManyAndCount();
     return new JsonCollection(data[0])
       .setLimit(limit)
@@ -266,6 +266,7 @@ export class OrderController {
       order.orderId,
       shoes.shoesId,
     );
+
     if (isDefined(orderDetail))
       throw new BadRequestException('Chi tiết đơn hàng đã tồn tại');
 

@@ -49,6 +49,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@nestjs/throttler", "virtual:67da80efdfb0d368447a1a0a17e9cd8bcd2849d03345d83fa6bb71a0717ebc075f58d1d23102136cb64fe526ce36455ccf70de9e5708ec70478cb799586fa8bd#npm:3.0.0"],\
             ["@nestjs/typeorm", "virtual:67da80efdfb0d368447a1a0a17e9cd8bcd2849d03345d83fa6bb71a0717ebc075f58d1d23102136cb64fe526ce36455ccf70de9e5708ec70478cb799586fa8bd#npm:9.0.0"],\
             ["@types/bcrypt", "npm:5.0.0"],\
+            ["@types/big.js", "npm:6.1.5"],\
             ["@types/crypto-js", "npm:4.1.1"],\
             ["@types/express", "npm:4.17.13"],\
             ["@types/jest", "npm:28.1.4"],\
@@ -59,6 +60,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@typescript-eslint/eslint-plugin", "virtual:67da80efdfb0d368447a1a0a17e9cd8bcd2849d03345d83fa6bb71a0717ebc075f58d1d23102136cb64fe526ce36455ccf70de9e5708ec70478cb799586fa8bd#npm:5.33.0"],\
             ["@typescript-eslint/parser", "virtual:67da80efdfb0d368447a1a0a17e9cd8bcd2849d03345d83fa6bb71a0717ebc075f58d1d23102136cb64fe526ce36455ccf70de9e5708ec70478cb799586fa8bd#npm:5.33.0"],\
             ["bcrypt", "npm:5.0.1"],\
+            ["big.js", "npm:6.2.1"],\
             ["class-transformer", "npm:0.5.1"],\
             ["class-validator", "npm:0.13.2"],\
             ["crypto-js", "npm:4.1.1"],\
@@ -2164,6 +2166,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@types/big.js", [\
+        ["npm:6.1.5", {\
+          "packageLocation": "./.yarn/cache/@types-big.js-npm-6.1.5-42b14a7218-5eb1472c1f.zip/node_modules/@types/big.js/",\
+          "packageDependencies": [\
+            ["@types/big.js", "npm:6.1.5"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@types/body-parser", [\
         ["npm:1.19.2", {\
           "packageLocation": "./.yarn/cache/@types-body-parser-npm-1.19.2-f845b7b538-e17840c7d7.zip/node_modules/@types/body-parser/",\
@@ -3476,6 +3487,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["bcrypt", "npm:5.0.1"],\
             ["@mapbox/node-pre-gyp", "npm:1.0.9"],\
             ["node-addon-api", "npm:3.2.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["big.js", [\
+        ["npm:6.2.1", {\
+          "packageLocation": "./.yarn/cache/big.js-npm-6.2.1-7d879136b2-0b234a2fd5.zip/node_modules/big.js/",\
+          "packageDependencies": [\
+            ["big.js", "npm:6.2.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -10320,6 +10340,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@nestjs/throttler", "virtual:67da80efdfb0d368447a1a0a17e9cd8bcd2849d03345d83fa6bb71a0717ebc075f58d1d23102136cb64fe526ce36455ccf70de9e5708ec70478cb799586fa8bd#npm:3.0.0"],\
             ["@nestjs/typeorm", "virtual:67da80efdfb0d368447a1a0a17e9cd8bcd2849d03345d83fa6bb71a0717ebc075f58d1d23102136cb64fe526ce36455ccf70de9e5708ec70478cb799586fa8bd#npm:9.0.0"],\
             ["@types/bcrypt", "npm:5.0.0"],\
+            ["@types/big.js", "npm:6.1.5"],\
             ["@types/crypto-js", "npm:4.1.1"],\
             ["@types/express", "npm:4.17.13"],\
             ["@types/jest", "npm:28.1.4"],\
@@ -10330,6 +10351,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@typescript-eslint/eslint-plugin", "virtual:67da80efdfb0d368447a1a0a17e9cd8bcd2849d03345d83fa6bb71a0717ebc075f58d1d23102136cb64fe526ce36455ccf70de9e5708ec70478cb799586fa8bd#npm:5.33.0"],\
             ["@typescript-eslint/parser", "virtual:67da80efdfb0d368447a1a0a17e9cd8bcd2849d03345d83fa6bb71a0717ebc075f58d1d23102136cb64fe526ce36455ccf70de9e5708ec70478cb799586fa8bd#npm:5.33.0"],\
             ["bcrypt", "npm:5.0.1"],\
+            ["big.js", "npm:6.2.1"],\
             ["class-transformer", "npm:0.5.1"],\
             ["class-validator", "npm:0.13.2"],\
             ["crypto-js", "npm:4.1.1"],\

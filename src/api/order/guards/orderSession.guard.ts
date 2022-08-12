@@ -5,13 +5,11 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { plainToInstance } from 'class-transformer';
 import { isDefined } from 'class-validator';
 import { AES, enc } from 'crypto-js';
 import * as dayjs from 'dayjs';
 import { Observable } from 'rxjs';
 import { Env } from 'src/shared/enums/Env.enum';
-import { OrderSessionRequest } from '../decoratos/orderSession.decorator';
 
 export const OrderSessionGuardMetaKey = 'orderSession';
 export const OrderSessionGuardHeaderKey = 'order-session';
@@ -32,13 +30,13 @@ export class OrderSessionGuard implements CanActivate {
     const data = JSON.parse(
       AES.decrypt(orderSession, Env.MESSAGE_ENCRYPTION_KEY).toString(enc.Utf8),
     );
-    try {
-      const orderSessionRequest = plainToInstance(OrderSessionRequest, data);
-      if (dayjs(orderSessionRequest.expiredAt).isBefore(dayjs())) return false;
-      Object.assign(req, { orderSession: orderSessionRequest });
-    } catch {
+
+    if (!isDefined(data))
       throw new BadRequestException('Invalid order session code');
-    }
+
+    const orderSessionRequest = data;
+    if (dayjs(orderSessionRequest.expiredAt).isBefore(dayjs())) return false;
+    Object.assign(req, { orderSession: orderSessionRequest });
     return true;
   }
 }
