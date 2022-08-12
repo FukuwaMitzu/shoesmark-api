@@ -1,5 +1,5 @@
 import { VIRTUAL_COLUMN_KEY } from './virtualColumn.decorator';
-import { SelectQueryBuilder } from 'typeorm';
+import { SelectQueryBuilder, getMetadataArgsStorage } from 'typeorm';
 import { isNotEmptyObject } from 'class-validator';
 declare module 'typeorm' {
   interface SelectQueryBuilder<Entity> {
@@ -18,11 +18,30 @@ SelectQueryBuilder.prototype.getMany = async function () {
     const metaInfo = Reflect.getMetadata(VIRTUAL_COLUMN_KEY, entity) ?? {};
     if (isNotEmptyObject(metaInfo)) {
       const key = metaInfo['propType'];
-      entity[key] = raw[index][metaInfo['name']];
-    }
-    return entity;
-  });
+      //Get list of primary metadata
+      const primary = getMetadataArgsStorage()
+        .filterColumns(entity.constructor)
+        .filter((field) => field.options.primary == true);
+      //Get table metadata
+      const table = getMetadataArgsStorage().filterTables(
+        entity.constructor,
+      )[0];
 
+      const index = raw.findIndex((data) => {
+        const keys = Object.keys(data);
+        return primary.every((prime) => {
+          const lookupCol = `${
+            table.name ?? entity.constructor.name.toLowerCase()
+          }_${prime.options.name ?? prime.propertyName}`;
+          if (keys.indexOf(lookupCol) == -1) return false;
+          return entity[prime.propertyName] == data[lookupCol];
+        });
+      });
+
+      if (index != -1) entity[key] = raw[index][metaInfo['name']];
+      return entity;
+    }
+  });
   return [...items];
 };
 
@@ -36,6 +55,25 @@ SelectQueryBuilder.prototype.getOne = async function () {
   if (isNotEmptyObject(metaInfo)) {
     const key = metaInfo['propType'];
     entity[key] = raw[0][metaInfo['name']];
+
+    //Get list of primary metadata
+    const primary = getMetadataArgsStorage()
+      .filterColumns(entity.constructor)
+      .filter((field) => field.options.primary == true);
+    //Get table metadata
+    const table = getMetadataArgsStorage().filterTables(entity.constructor)[0];
+
+    const index = raw.findIndex((data) => {
+      const keys = Object.keys(data);
+      return primary.every((prime) => {
+        const lookupCol = `${
+          table.name ?? entity.constructor.name.toLowerCase()
+        }_${prime.options.name ?? prime.propertyName}`;
+        if (keys.indexOf(lookupCol) == -1) return false;
+        return entity[prime.propertyName] == data[lookupCol];
+      });
+    });
+    if (index != -1) entity[key] = raw[index][metaInfo['name']];
   }
   return entity;
 };
@@ -44,6 +82,8 @@ SelectQueryBuilder.prototype.getOne = async function () {
 const originExecute = SelectQueryBuilder.prototype.executeEntitiesAndRawResults;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
+
+//Fix relation ormtype
 SelectQueryBuilder.prototype.executeEntitiesAndRawResults = async function (
   queryRunner,
 ) {
@@ -52,7 +92,27 @@ SelectQueryBuilder.prototype.executeEntitiesAndRawResults = async function (
     const metaInfo = Reflect.getMetadata(VIRTUAL_COLUMN_KEY, entity) ?? {};
     if (isNotEmptyObject(metaInfo)) {
       const key = metaInfo['propType'];
-      entity[key] = raw[index][metaInfo['name']];
+      //Get list of primary metadata
+      const primary = getMetadataArgsStorage()
+        .filterColumns(entity.constructor)
+        .filter((field) => field.options.primary == true);
+      //Get table metadata
+      const table = getMetadataArgsStorage().filterTables(
+        entity.constructor,
+      )[0];
+
+      const index = raw.findIndex((data) => {
+        const keys = Object.keys(data);
+        return primary.every((prime) => {
+          const lookupCol = `${
+            table.name ?? entity.constructor.name.toLowerCase()
+          }_${prime.options.name ?? prime.propertyName}`;
+          if (keys.indexOf(lookupCol) == -1) return false;
+          return entity[prime.propertyName] == data[lookupCol];
+        });
+      });
+
+      if (index != -1) entity[key] = raw[index][metaInfo['name']];
     }
   });
   return { entities, raw };
