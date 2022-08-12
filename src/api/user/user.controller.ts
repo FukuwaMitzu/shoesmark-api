@@ -52,13 +52,6 @@ export class UserController {
     return new JsonEntity(user);
   }
 
-  @Get(':id')
-  @Authenticate(Role.Admin, Role.Employee)
-  async getUserById(@Param() getUserParamDto: GetUserParamDto) {
-    const data = await this.userService.findById(getUserParamDto.id);
-    return new JsonEntity(data);
-  }
-
   @Post()
   @Authenticate(Role.Admin, Role.Employee)
   async createUser(@Body() createUserDto: CreateUserDto) {
@@ -68,9 +61,15 @@ export class UserController {
   }
 
   @Get('exist')
-  @Authenticate(Role.Admin, Role.Employee)
   async userExist(@Query() userExistDto: UserExistDto) {
     return new JsonAction();
+  }
+
+  @Get(':id')
+  @Authenticate(Role.Admin, Role.Employee)
+  async getUserById(@Param() getUserParamDto: GetUserParamDto) {
+    const data = await this.userService.findById(getUserParamDto.id);
+    return new JsonEntity(data);
   }
 
   @Put()

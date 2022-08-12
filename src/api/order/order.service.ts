@@ -57,6 +57,9 @@ export class OrderService implements ICRUDService<Order> {
       .leftJoinAndSelect('order.owner', 'owner')
       .leftJoinAndSelect('order.details', 'details')
       .leftJoinAndSelect('details.shoes', 'shoes')
+      .leftJoinAndSelect('shoes.color', 'color')
+      .leftJoinAndSelect('shoes.brand', 'brand')
+      .leftJoinAndSelect('shoes.categories', 'categories')
       .leftJoinAndSelect(
         (qb) =>
           qb

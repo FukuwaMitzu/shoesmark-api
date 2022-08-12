@@ -1,15 +1,19 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { Type } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
 import { IsEmail, IsEnum } from 'class-validator';
 import { AccessAction } from '../enums/activationAction.enum';
 
+@Exclude()
 export class AccessRequest {
+  @Expose()
   @IsEmail()
   email: string;
 
+  @Expose()
   @IsEnum(AccessAction)
   action: AccessAction;
 
+  @Expose()
   @Type(() => Date)
   expiredAt: Date;
 }
