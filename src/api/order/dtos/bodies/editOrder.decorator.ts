@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IsDateString,
+  IsEmail,
   IsEnum,
   IsOptional,
   IsPhoneNumber,
@@ -9,9 +9,20 @@ import {
   Length,
 } from 'class-validator';
 import { Gender } from 'src/api/user/enums/gender';
+import { OrderStatus } from '../../enums/orderStatus.enum';
 import { PaymentMethod } from '../../enums/paymentMedthod.enum';
 
 export class EditOrderDto {
+  @ApiPropertyOptional()
+  @IsEnum(OrderStatus)
+  @IsOptional()
+  status?: OrderStatus;
+
+  @ApiPropertyOptional()
+  @IsEmail()
+  @IsOptional()
+  orderEmail?: string;
+
   @ApiPropertyOptional()
   @Length(1, 25)
   @IsString()
@@ -69,7 +80,11 @@ export class EditOrderDto {
 
   @ApiPropertyOptional()
   @Type(() => Date)
-  @IsDateString()
   @IsOptional()
   datePurchased?: Date;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  onlinePaymentId?: string;
 }

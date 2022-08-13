@@ -37,17 +37,12 @@ export class ShoesController {
 
   @Get()
   async getShoes(@Query() getShoesDto: GetShoesDto) {
-    const { limit, offset, ids, shoesName, categoryIds, colorId, price, size } =
-      getShoesDto;
+    const { limit, offset, ids, ...rest } = getShoesDto;
     const data = await this.shoesService.findAll({
       limit,
       offset,
       ids,
-      shoesName,
-      categoryIds,
-      colorId,
-      price,
-      size,
+      ...rest,
     });
     return new JsonCollection(data[0])
       .setLimit(limit)

@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsUUID, Min } from 'class-validator';
+import { IsNumber, IsOptional, IsUUID, Min } from 'class-validator';
 import { ShoesIdMustExist } from 'src/api/shoes/validators/decorators/shoesIdMustExist.decorator';
 
 export class CreateOrderDetailDto {
@@ -9,8 +9,24 @@ export class CreateOrderDetailDto {
   @IsUUID()
   shoesId: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Min(1)
   @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
   quantity: number;
+
+  @ApiPropertyOptional()
+  @Min(0)
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  sale: number;
+
+  @ApiPropertyOptional()
+  @Min(0)
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  price: number;
 }

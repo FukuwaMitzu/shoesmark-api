@@ -12,6 +12,7 @@ class ShoesFindAllOptions implements IFindAllOptions {
   shoesName?: string;
   categoryIds?: string[];
   colorId?: string;
+  SKU?: string;
   price?: {
     from: number;
     to?: number;
@@ -61,6 +62,8 @@ export class ShoesService implements ICRUDService<Shoes> {
     }
     if (options.size)
       query.andWhere('shoes.size = :size', { size: options.size });
+    if (options.SKU)
+      query.andWhere('shoes.SKU ILIKE :SKU', { SKU: `%${options.SKU}%` });
     return await query.getManyAndCount();
   }
   async update(value: Shoes): Promise<Shoes> {

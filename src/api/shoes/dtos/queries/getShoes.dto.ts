@@ -78,6 +78,12 @@ export class GetShoesDto {
   size?: number;
 
   @ApiPropertyOptional()
+  @IsString()
+  @Type(() => String)
+  @IsOptional()
+  SKU?: string;
+
+  @ApiPropertyOptional()
   @ValidateNested()
   @Type(() => PriceFilter)
   @IsOptional()

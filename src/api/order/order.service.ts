@@ -43,7 +43,11 @@ export class OrderService implements ICRUDService<Order> {
       relations: {
         owner: true,
         details: {
-          shoes: true,
+          shoes: {
+            brand: true,
+            color: true,
+            categories: true,
+          },
         },
       },
     });

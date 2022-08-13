@@ -214,6 +214,109 @@ export class OrderController {
     return new JsonAction();
   }
 
+  //Admin
+  @Put(':id')
+  @Authenticate(Role.Admin, Role.Employee, Role.User)
+  async editOrder(
+    @Body() editOrderDto: EditOrderDto,
+    @Param() orderParamDto: OrderParamDto,
+  ) {
+    let order = await this.orderService.findById(orderParamDto.id);
+    if (!isDefined(order))
+      throw new BadRequestException('Không tìm thấy đơn hàng');
+
+    order = plainToInstance(Order, { ...order, ...editOrderDto });
+
+    //Avoid insert to database
+    delete order.details;
+    await this.orderService.update(order);
+    return new JsonEntity(order);
+  }
+  @Post(':id/detail')
+  @Authenticate(Role.Admin, Role.Employee, Role.User)
+  async createOrderDetail(
+    @Param() orderParamDto: OrderParamDto,
+    @Body() createOrderDetailDto: CreateOrderDetailDto,
+  ) {
+    const order = await this.orderService.findById(orderParamDto.id);
+    if (!isDefined(order))
+      throw new BadRequestException('Không tìm thấy đơn hàng');
+    if (order.status != OrderStatus.WAIT_FOR_CONFIRMATION)
+      throw new BadRequestException('Đơn hàng đã được xác nhận');
+
+    const shoes = await this.shoesService.findById(
+      createOrderDetailDto.shoesId,
+    );
+    let orderDetail = await this.orderDetailService.findById(
+      order.orderId,
+      shoes.shoesId,
+    );
+    if (isDefined(orderDetail))
+      throw new BadRequestException('Chi tiết đơn hàng đã tồn tại');
+
+    if (shoes.quantity < createOrderDetailDto.quantity)
+      throw new BadRequestException('Số lượng quá mức yêu cầu');
+
+    orderDetail = new OrderDetail();
+    orderDetail.order = order;
+    orderDetail.shoes = shoes;
+    orderDetail.sale = shoes.sale;
+    orderDetail.price = shoes.price;
+    orderDetail.quantity = createOrderDetailDto.quantity;
+    await this.orderDetailService.update(orderDetail);
+    return new JsonEntity(orderDetail);
+  }
+  @Put(':id/detail')
+  @Authenticate(Role.Admin, Role.Employee, Role.User)
+  async editOrderDetail(
+    @Param() orderParamDto: OrderParamDto,
+    @Body() editOrderDetailDto: EditOrderDetailDto,
+  ) {
+    const order = await this.orderService.findById(orderParamDto.id);
+    if (!isDefined(order))
+      throw new BadRequestException('Không tìm thấy đơn hàng');
+    if (order.status != OrderStatus.WAIT_FOR_CONFIRMATION)
+      throw new BadRequestException('Đơn hàng đã được xác nhận');
+
+    const orderDetail = order.details.find(
+      (detail) => detail.shoesId == editOrderDetailDto.shoesId,
+    );
+    if (!isDefined(orderDetail))
+      throw new BadRequestException('Chi tiết đơn hàng không tồn tại');
+
+    if (orderDetail.shoes.quantity < editOrderDetailDto.quantity)
+      throw new BadRequestException('Số lượng quá mức yêu cầu');
+
+    orderDetail.quantity = editOrderDetailDto.quantity;
+    await this.orderDetailService.update(orderDetail);
+    return new JsonEntity(orderDetail);
+  }
+  @Delete(':id/detail')
+  @Authenticate(Role.Admin, Role.Employee, Role.User)
+  async deleteOrderDetail(
+    @Param() orderParamDto: OrderParamDto,
+    @Body() deleteOrderDetail: DeleteOrderDetailDto,
+  ) {
+    const order = await this.orderService.findById(orderParamDto.id);
+    if (!isDefined(order))
+      throw new BadRequestException('Không tìm thấy đơn hàng');
+    if (order.status != OrderStatus.WAIT_FOR_CONFIRMATION)
+      throw new BadRequestException('Đơn hàng đã được xác nhận');
+
+    const orderDetail = await this.orderDetailService.findById(
+      order.orderId,
+      deleteOrderDetail.shoesId,
+    );
+    if (!isDefined(orderDetail))
+      throw new BadRequestException('Chi tiết đơn hàng không tồn tại');
+
+    await this.orderDetailService.deleteById(
+      orderDetail.orderId,
+      deleteOrderDetail.shoesId,
+    );
+    return new JsonAction();
+  }
+
   //Tìm kiếm đơn hàng của admin
   @Get()
   @Authenticate(Role.Admin, Role.Employee)
