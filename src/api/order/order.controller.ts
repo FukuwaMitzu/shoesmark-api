@@ -214,6 +214,56 @@ export class OrderController {
     return new JsonAction();
   }
 
+  //Dành cho khách ẩn danh
+  @Post('anonymous')
+  async createOrder(@Body() createOrderDto: CreateOrderDto) {
+    const order = plainToInstance(Order, createOrderDto);
+    order.status = OrderStatus.WAIT_FOR_CONFIRMATION;
+    const result = new JsonEntity(await this.orderService.update(order));
+    return {
+      ...result,
+      orderSessionToken: await this.orderService.createOrderSessionToken(
+        order.orderId,
+      ),
+    };
+  }
+
+  @Post('anonymous/detail')
+  @RequireOrderSession()
+  async createDetailOrder(
+    @OrderSession() orderSession: OrderSessionRequest,
+    @Body() createOrderDetailDto: CreateOrderDetailDto,
+  ) {
+    const order = await this.orderService.findById(orderSession.orderId);
+    if (!isDefined(order))
+      throw new BadRequestException('Không tìm thấy đơn hàng');
+    if (order.status != OrderStatus.WAIT_FOR_CONFIRMATION)
+      throw new BadRequestException('Đơn hàng đã được xác nhận');
+
+    const shoes = await this.shoesService.findById(
+      createOrderDetailDto.shoesId,
+    );
+    let orderDetail = await this.orderDetailService.findById(
+      order.orderId,
+      shoes.shoesId,
+    );
+
+    if (isDefined(orderDetail))
+      throw new BadRequestException('Chi tiết đơn hàng đã tồn tại');
+
+    if (shoes.quantity < createOrderDetailDto.quantity)
+      throw new BadRequestException('Số lượng quá mức yêu cầu');
+
+    orderDetail = new OrderDetail();
+    orderDetail.order = order;
+    orderDetail.shoes = shoes;
+    orderDetail.sale = shoes.sale;
+    orderDetail.price = shoes.price;
+    orderDetail.quantity = createOrderDetailDto.quantity;
+    await this.orderDetailService.update(orderDetail);
+    return new JsonEntity(orderDetail);
+  }
+
   //Admin
   @Put(':id')
   @Authenticate(Role.Admin, Role.Employee, Role.User)
@@ -362,63 +412,6 @@ export class OrderController {
     return new JsonAction();
   }
 
-  //Xoá đơn hàng của admin
-  @Delete()
-  @Authenticate(Role.Admin, Role.Employee)
-  async deleteManyOrder(@Body() deleteManyOrder: DeleteManyOrderDto) {
-    await this.orderService.deleteMany(deleteManyOrder.ids);
-    return new JsonAction();
-  }
-
-  //Dành cho khách ẩn danh
-  @Post('anonymous')
-  async createOrder(@Body() createOrderDto: CreateOrderDto) {
-    const order = plainToInstance(Order, createOrderDto);
-    order.status = OrderStatus.WAIT_FOR_CONFIRMATION;
-    const result = new JsonEntity(await this.orderService.update(order));
-    return {
-      ...result,
-      orderSessionToken: await this.orderService.createOrderSessionToken(
-        order.orderId,
-      ),
-    };
-  }
-  @Post('anonymous/detail')
-  @RequireOrderSession()
-  async createDetailOrder(
-    @OrderSession() orderSession: OrderSessionRequest,
-    @Body() createOrderDetailDto: CreateOrderDetailDto,
-  ) {
-    const order = await this.orderService.findById(orderSession.orderId);
-    if (!isDefined(order))
-      throw new BadRequestException('Không tìm thấy đơn hàng');
-    if (order.status != OrderStatus.WAIT_FOR_CONFIRMATION)
-      throw new BadRequestException('Đơn hàng đã được xác nhận');
-
-    const shoes = await this.shoesService.findById(
-      createOrderDetailDto.shoesId,
-    );
-    let orderDetail = await this.orderDetailService.findById(
-      order.orderId,
-      shoes.shoesId,
-    );
-
-    if (isDefined(orderDetail))
-      throw new BadRequestException('Chi tiết đơn hàng đã tồn tại');
-
-    if (shoes.quantity < createOrderDetailDto.quantity)
-      throw new BadRequestException('Số lượng quá mức yêu cầu');
-
-    orderDetail = new OrderDetail();
-    orderDetail.order = order;
-    orderDetail.shoes = shoes;
-    orderDetail.sale = shoes.sale;
-    orderDetail.price = shoes.price;
-    orderDetail.quantity = createOrderDetailDto.quantity;
-    await this.orderDetailService.update(orderDetail);
-    return new JsonEntity(orderDetail);
-  }
-
   //Xác nhận đơn hàng
   @Post(':id/confirmOrder')
   @Authenticate(Role.Admin, Role.Employee)
@@ -436,5 +429,13 @@ export class OrderController {
       await this.shoesService.getRepository().save(shoesList);
     }
     return new JsonEntity(data);
+  }
+
+  //Xoá đơn hàng của admin
+  @Delete()
+  @Authenticate(Role.Admin, Role.Employee)
+  async deleteManyOrder(@Body() deleteManyOrder: DeleteManyOrderDto) {
+    await this.orderService.deleteMany(deleteManyOrder.ids);
+    return new JsonAction();
   }
 }

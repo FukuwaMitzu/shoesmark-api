@@ -8,8 +8,8 @@ import {
 
 export function RequireOrderSession() {
   return applyDecorators(
+    ApiHeader({ name: OrderSessionGuardHeaderKey }),
     SetMetadata(OrderSessionGuardMetaKey, true),
     UseGuards(OrderSessionGuard),
-    ApiHeader({ name: OrderSessionGuardHeaderKey }),
   );
 }
