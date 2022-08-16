@@ -1,19 +1,21 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { Exclude, Expose } from 'class-transformer';
-import { IsBoolean, IsEnum, IsUUID } from 'class-validator';
+import { Exclude, Expose, Type } from 'class-transformer';
+import { Allow, IsEnum } from 'class-validator';
 import { Role } from '../enums/role.enum';
 
 @Exclude()
 export class AuthRequest {
   @Expose()
-  @IsUUID()
+  @Allow()
   userId: string;
 
   @Expose()
-  @IsBoolean()
+  @Allow()
+  @Type(() => Boolean)
   isActive: boolean;
 
   @Expose()
+  @Allow()
   @IsEnum(Role)
   role: Role;
 }

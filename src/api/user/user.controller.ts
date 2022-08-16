@@ -72,9 +72,9 @@ export class UserController {
     return new JsonEntity(data);
   }
 
-  @Put()
-  @Authenticate(Role.Admin, Role.Employee)
-  async updateUser() {}
+  // @Put()
+  // @Authenticate(Role.Admin, Role.Employee)
+  // async updateUser() {}
 
   @Delete()
   @Authenticate(Role.Admin, Role.Employee)

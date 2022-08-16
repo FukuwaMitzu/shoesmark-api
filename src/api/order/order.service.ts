@@ -20,14 +20,16 @@ export class OrderSortBy {
   gender?: 'ASC' | 'DESC';
 }
 
-class OrderFindAllOptions implements IFindAllOptions {
-  limit: number;
-  offset: number;
-  ids: string[];
+//TODO: change to class when face problems
+interface OrderFindAllOptions extends IFindAllOptions {
+  ids?: string[];
   ownerIds?: string[];
   onlyAnonymous?: boolean;
   fullName?: string;
-  sortBy: OrderSortBy;
+  sortBy?: OrderSortBy;
+  createdAt?: { since: Date; to?: Date };
+  datePurchased?: { since: Date; to?: Date };
+  isPaid?: boolean;
 }
 
 @Injectable()
@@ -55,8 +57,12 @@ export class OrderService implements ICRUDService<Order> {
 
   getPreBuiltFindAllQuery(
     options: OrderFindAllOptions,
+    subquery?: boolean,
   ): SelectQueryBuilder<Order> {
-    const queryBD = this.orderRepository.createQueryBuilder('order');
+    let queryBD = this.orderRepository.createQueryBuilder('order');
+    if (subquery) {
+      queryBD = queryBD.subQuery().select().from(Order, 'order');
+    }
     queryBD
       .leftJoinAndSelect('order.owner', 'owner')
       .leftJoinAndSelect('order.details', 'details')
@@ -115,7 +121,7 @@ export class OrderService implements ICRUDService<Order> {
       queryBD.andWhere('order.owner.userId IN (:...ownerIds)', {
         ownerIds: options.ownerIds,
       });
-    if (options.ids.length > 0)
+    if (options.ids?.length > 0)
       queryBD.andWhere('order.orderId IN (:...ids)', { ids: options.ids });
     if (options.onlyAnonymous === true) queryBD.andWhere('order.owner IS NULL');
     if (options.fullName)
@@ -123,6 +129,24 @@ export class OrderService implements ICRUDService<Order> {
         "order.orderLastName || ' ' || order.orderFirstName ILIKE :fullName",
         { fullName: `%${options.fullName}%` },
       );
+    if (options.createdAt) {
+      queryBD.andWhere('order.createdAt between (:since) and (:to)', {
+        since: options.createdAt.since,
+        to: options.createdAt.to ?? dayjs().toDate(),
+      });
+    }
+    if (isDefined(options.isPaid)) {
+      if (options.isPaid) queryBD.andWhere('order.datePurchased IS NOT NULL');
+      else queryBD.andWhere('order.datePurchased IS NULL');
+    }
+    if (options.datePurchased) {
+      queryBD.andWhere('order.datePurchased between (:since) and (:to)', {
+        since: options.datePurchased.since,
+        to: options.datePurchased.to ?? dayjs().toDate(),
+      });
+    }
+    if (options.limit) queryBD.take(options.limit);
+    if (options.offset) queryBD.skip(options.offset);
 
     return queryBD;
   }

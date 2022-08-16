@@ -18,6 +18,7 @@ import { OrderModule } from './api/order/order.module';
 import './shared/decorators/virtualColumn/polifill';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { StatisticModule } from './api/statistic/statistic.module';
 
 @Module({
   imports: [
@@ -84,6 +85,7 @@ import { join } from 'path';
     ShoesModule,
     ImportOrderModule,
     OrderModule,
+    StatisticModule,
   ],
   controllers: [AppController],
 })

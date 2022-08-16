@@ -26,7 +26,6 @@ export class OrderSessionGuard implements CanActivate {
     if (!isDefined(action)) return true;
     const req = context.switchToHttp().getRequest<Request>();
     const orderSession = req.headers[OrderSessionGuardHeaderKey];
-    console.log(orderSession);
     if (!isDefined(orderSession)) return false;
     const data = JSON.parse(
       AES.decrypt(orderSession, Env.MESSAGE_ENCRYPTION_KEY).toString(enc.Utf8),
