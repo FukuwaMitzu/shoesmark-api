@@ -18,6 +18,7 @@ export class OrderSortBy {
   datePurchased?: 'ASC' | 'DESC';
   status?: 'ASC' | 'DESC';
   gender?: 'ASC' | 'DESC';
+  dateUpdated?: 'ASC' | 'DESC';
 }
 
 //TODO: change to class when face problems
@@ -29,6 +30,7 @@ interface OrderFindAllOptions extends IFindAllOptions {
   sortBy?: OrderSortBy;
   createdAt?: { since: Date; to?: Date };
   datePurchased?: { since: Date; to?: Date };
+  status?: OrderStatus;
   isPaid?: boolean;
 }
 
@@ -116,6 +118,12 @@ export class OrderService implements ICRUDService<Order> {
           options.sortBy.gender,
           options.sortBy.gender == 'ASC' ? 'NULLS FIRST' : 'NULLS LAST',
         );
+      if (isDefined(options.sortBy.dateUpdated))
+        queryBD.addOrderBy(
+          'order.updatedAt',
+          options.sortBy.dateUpdated,
+          options.sortBy.dateUpdated == 'ASC' ? 'NULLS FIRST' : 'NULLS LAST',
+        );
     }
     if (options.ownerIds?.length > 0)
       queryBD.andWhere('order.owner.userId IN (:...ownerIds)', {
@@ -144,6 +152,9 @@ export class OrderService implements ICRUDService<Order> {
         since: options.datePurchased.since,
         to: options.datePurchased.to ?? dayjs().toDate(),
       });
+    }
+    if (options.status) {
+      queryBD.andWhere('order.status = :status', { status: options.status });
     }
     if (options.limit) queryBD.take(options.limit);
     if (options.offset) queryBD.skip(options.offset);

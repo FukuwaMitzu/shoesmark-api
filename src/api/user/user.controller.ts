@@ -18,6 +18,8 @@ import { Authenticate } from '../auth/decorators/authenticate.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { CreateUserDto } from './dtos/bodies/createUser.dto';
 import { DeleteManyUserDto } from './dtos/bodies/deleteManyUser.dto';
+import { EditMeDto } from './dtos/bodies/editMe.dto';
+import { EditUserDto } from './dtos/bodies/editUser.dto';
 import { GetUserParamDto } from './dtos/params/getUserParam.dto';
 import { GetUserDto } from './dtos/queries/getUser.dto';
 import { UserExistDto } from './dtos/queries/userExist.dto';
@@ -51,6 +53,14 @@ export class UserController {
     const user = await this.userService.findById(auth.userId);
     return new JsonEntity(user);
   }
+  @Put('me')
+  @Authenticate(Role.Admin, Role.Employee, Role.User)
+  async editMe(@Auth() auth: AuthRequest, @Body() editMeDto: EditMeDto) {
+    const user = await this.userService.findById(auth.userId, true);
+    const newUser = plainToInstance(User, { ...user, ...editMeDto });
+    await this.userService.update(newUser);
+    return new JsonEntity(newUser);
+  }
 
   @Post()
   @Authenticate(Role.Admin, Role.Employee)
@@ -72,9 +82,17 @@ export class UserController {
     return new JsonEntity(data);
   }
 
-  // @Put()
-  // @Authenticate(Role.Admin, Role.Employee)
-  // async updateUser() {}
+  @Put(':id')
+  @Authenticate(Role.Admin, Role.Employee)
+  async updateUser(
+    @Param() getUserParamDto: GetUserParamDto,
+    @Body() editUserDto: EditUserDto,
+  ) {
+    const user = await this.userService.findById(getUserParamDto.id, true);
+    const newUser = plainToInstance(User, { ...user, ...editUserDto });
+    await this.userService.update(newUser);
+    return new JsonEntity(newUser);
+  }
 
   @Delete()
   @Authenticate(Role.Admin, Role.Employee)

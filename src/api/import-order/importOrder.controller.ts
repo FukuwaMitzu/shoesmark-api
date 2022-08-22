@@ -58,6 +58,13 @@ export class ImportOrderController {
       .setTotal(data[1]);
   }
 
+  @Get(':id')
+  @Authenticate(Role.Admin, Role.Employee)
+  async getImportOrderById(@Param() importOrderParamDto: ImportOrderParamDto) {
+    const data = await this.importOrderService.findById(importOrderParamDto.id);
+    return new JsonEntity(data);
+  }
+
   @Post()
   @Authenticate(Role.Admin, Role.Employee)
   async createImportOrder(
@@ -84,7 +91,7 @@ export class ImportOrderController {
       ...importOrder,
       ...editImportOrderDto,
     });
-    await this.importOrderService.update(importOrder);
+    await this.importOrderService.update(data);
     return new JsonEntity(importOrder);
   }
 

@@ -29,6 +29,7 @@ import { EditShoesDto } from './dtos/bodies/editShoes.dto';
 import { isDefined } from 'class-validator';
 import { Category } from '../category/entities/category.entity';
 import { DeleteManyShoesDto } from './dtos/bodies/deleteManyShoes.dto';
+import { GetRelatedDto } from './dtos/queries/getRelated.dto';
 
 @ApiTags('Giày')
 @Controller('shoes')
@@ -49,13 +50,23 @@ export class ShoesController {
       .setOffset(offset)
       .setTotal(data[1]);
   }
-
+  @Get('related')
+  async getRelated(@Query() getRelated: GetRelatedDto) {
+    const data = await this.shoesService.related(
+      getRelated.shoesId,
+      getRelated.limit,
+      getRelated.offset,
+    );
+    return new JsonCollection(data[0])
+      .setLimit(getRelated.limit)
+      .setOffset(getRelated.offset)
+      .setTotal(data[1]);
+  }
   @Get(':id')
   async getShoesById(@Param() shoesParamDto: ShoesParamDto) {
     const data = await this.shoesService.findById(shoesParamDto.id);
     return new JsonEntity(data);
   }
-
   @Post()
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('shoesImage'))

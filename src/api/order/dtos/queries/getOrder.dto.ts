@@ -10,6 +10,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Sort } from 'src/shared/enums/Sort.enum';
+import { OrderStatus } from '../../enums/orderStatus.enum';
 
 class OrderDto {
   @ApiPropertyOptional({ enum: Sort, name: 'sortBy[dateCreated]' })
@@ -36,6 +37,11 @@ class OrderDto {
   @IsEnum(Sort)
   @IsOptional()
   gender?: Sort;
+
+  @ApiPropertyOptional({ enum: Sort, name: 'sortBy[dateUpdated]' })
+  @IsEnum(Sort)
+  @IsOptional()
+  dateUpdated?: Sort;
 }
 
 export class GetOrderDto {
@@ -77,6 +83,11 @@ export class GetOrderDto {
   @IsString()
   @IsOptional()
   fullName?: string;
+
+  @ApiPropertyOptional()
+  @IsEnum(OrderStatus)
+  @IsOptional()
+  status?: OrderStatus;
 
   @ApiPropertyOptional({ type: OrderDto })
   @Type(() => OrderDto)

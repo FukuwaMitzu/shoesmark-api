@@ -372,8 +372,16 @@ export class OrderController {
   @Get()
   @Authenticate(Role.Admin, Role.Employee)
   async getOrder(@Query() getOrderDto: GetOrderDto) {
-    const { limit, offset, ids, ownerIds, onlyAnonymous, fullName, sortBy } =
-      getOrderDto;
+    const {
+      limit,
+      offset,
+      ids,
+      ownerIds,
+      onlyAnonymous,
+      fullName,
+      status,
+      sortBy,
+    } = getOrderDto;
     const data = await this.orderService
       .getPreBuiltFindAllQuery({
         limit,
@@ -383,6 +391,7 @@ export class OrderController {
         onlyAnonymous,
         fullName,
         sortBy,
+        status,
       })
       .getManyAndCount();
     return new JsonCollection(data[0])

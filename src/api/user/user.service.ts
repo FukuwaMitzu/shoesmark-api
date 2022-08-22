@@ -22,7 +22,14 @@ export class UserService implements ICRUDService<User> {
     return this.userRepository;
   }
 
-  async findById(id: string): Promise<User> {
+  async findById(id: string, sensitive?: boolean): Promise<User> {
+    if (sensitive) {
+      const query = this.userRepository.createQueryBuilder('user');
+      return await query
+        .addSelect('user.password')
+        .andWhere('user.userId = :id', { id: id })
+        .getOne();
+    }
     return await this.userRepository.findOne({ where: { userId: id } });
   }
 
