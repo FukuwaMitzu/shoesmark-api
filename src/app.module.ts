@@ -61,12 +61,15 @@ import { StatisticModule } from './api/statistic/statistic.module';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
         return {
+          url: configService.get(Env.DB_URL),
+          port: configService.get(Env.DB_HOST),
           type: 'postgres',
-          host: 'localhost',
+          host: configService.get(Env.DB_HOST),
           username: configService.get(Env.DB_USERNAME),
           password: configService.get(Env.DB_PASSWORD),
-          database: 'shoesmark',
-          synchronize: true,
+          database: configService.get(Env.DB_DATABASE),
+          ssl: { rejectUnauthorized: false },
+          synchronize: false,
           autoLoadEntities: true,
         };
       },

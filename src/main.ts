@@ -30,6 +30,6 @@ async function bootstrap() {
   const doc = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, doc);
 
-  await app.listen(3300);
+  await app.listen(parseInt(process.env.PORT) || 3300);
 }
 bootstrap();

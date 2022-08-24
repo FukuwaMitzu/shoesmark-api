@@ -32,6 +32,7 @@ import { DeleteManyShoesDto } from './dtos/bodies/deleteManyShoes.dto';
 import { GetRelatedDto } from './dtos/queries/getRelated.dto';
 import { ConfigService } from '@nestjs/config';
 import * as imgbbUploader from 'imgbb-uploader';
+import { Env } from 'src/shared/enums/Env.enum';
 @ApiTags('Giày')
 @Controller('shoes')
 export class ShoesController {
@@ -40,8 +41,8 @@ export class ShoesController {
     private readonly configService: ConfigService,
   ) {}
 
-  domain = this.configService.get('SHOESMARK_API_DOMAIN');
-  imgbbKey = this.configService.get('IMGBB_API_KEY');
+  // domain = this.configService.get('SHOESMARK_API_DOMAIN');
+  imgbbKey = this.configService.get(Env.IMGBB_API_KEY);
 
   @Get()
   async getShoes(@Query() getShoesDto: GetShoesDto) {
