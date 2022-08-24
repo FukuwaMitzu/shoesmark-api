@@ -69,7 +69,7 @@ import { StatisticModule } from './api/statistic/statistic.module';
           password: configService.get(Env.DB_PASSWORD),
           database: configService.get(Env.DB_DATABASE),
           ssl: { rejectUnauthorized: false },
-          synchronize: false,
+          synchronize: true,
           autoLoadEntities: true,
         };
       },
