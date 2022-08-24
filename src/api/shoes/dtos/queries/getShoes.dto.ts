@@ -1,7 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
+  Allow,
   IsArray,
+  IsEnum,
   IsNumber,
   IsOptional,
   IsPositive,
@@ -12,8 +14,15 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { ColorIdMustExist } from 'src/api/color/validators/decorators/colorIdMustExist.decorator';
+import { Sort } from 'src/shared/enums/Sort.enum';
 
-class PriceFilter {
+class ShoesSortByDto {
+  @ApiPropertyOptional({ enum: Sort, name: 'sortBy[sale]' })
+  @IsEnum(Sort)
+  @IsOptional()
+  sale?: Sort;
+}
+class NumberRange {
   @ApiProperty()
   @IsNumber()
   @Type(() => Number)
@@ -24,6 +33,18 @@ class PriceFilter {
   @Type(() => Number)
   @IsOptional()
   to?: number;
+}
+
+class DateRange {
+  @ApiProperty()
+  @Allow()
+  @Type(() => Date)
+  since: Date;
+
+  @ApiPropertyOptional()
+  @Type(() => Date)
+  @IsOptional()
+  to?: Date;
 }
 
 export class GetShoesDto {
@@ -85,7 +106,25 @@ export class GetShoesDto {
 
   @ApiPropertyOptional()
   @ValidateNested()
-  @Type(() => PriceFilter)
+  @Type(() => NumberRange)
   @IsOptional()
-  price?: PriceFilter;
+  price?: NumberRange;
+
+  @ApiPropertyOptional()
+  @ValidateNested()
+  @Type(() => NumberRange)
+  @IsOptional()
+  sale?: NumberRange;
+
+  @ApiPropertyOptional()
+  @ValidateNested()
+  @Type(() => DateRange)
+  @IsOptional()
+  dateCreated?: DateRange;
+
+  @ApiPropertyOptional({ type: ShoesSortByDto })
+  @Type(() => ShoesSortByDto)
+  @ValidateNested()
+  @IsOptional()
+  sortBy?: ShoesSortByDto;
 }

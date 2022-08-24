@@ -16,8 +16,6 @@ import { ShoesModule } from './api/shoes/shoes.module';
 import { ImportOrderModule } from './api/import-order/importOrder.module';
 import { OrderModule } from './api/order/order.module';
 import './shared/decorators/virtualColumn/polifill';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { StatisticModule } from './api/statistic/statistic.module';
 
 @Module({
@@ -75,10 +73,6 @@ import { StatisticModule } from './api/statistic/statistic.module';
       },
       inject: [ConfigService],
     }),
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..', 'uploads'),
-    //   serveRoot: '/uploads',
-    // }),
     ScheduleModule.forRoot(),
     AuthModule,
     UserModule,

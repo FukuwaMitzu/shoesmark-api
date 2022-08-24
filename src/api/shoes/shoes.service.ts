@@ -1,10 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { isDefined } from 'class-validator';
+import dayjs from 'dayjs';
 import { ICRUDService } from 'src/shared/interfaces/ICRUDService.interface';
 import { IFindAllOptions } from 'src/shared/interfaces/IFindAllOptions.interface';
 import { Brackets, In, Repository } from 'typeorm';
 import { Shoes } from './entities/shoes.entity';
 
+export class ShoesSortBy {
+  sale?: 'ASC' | 'DESC';
+}
+class DateRange {
+  since: Date;
+  to?: Date;
+}
+class NumberRange {
+  from: number;
+  to?: number;
+}
 class ShoesFindAllOptions implements IFindAllOptions {
   limit: number;
   offset: number;
@@ -13,11 +26,11 @@ class ShoesFindAllOptions implements IFindAllOptions {
   categoryIds?: string[];
   colorId?: string;
   SKU?: string;
-  price?: {
-    from: number;
-    to?: number;
-  };
+  price?: NumberRange;
+  sale?: NumberRange;
+  dateCreated?: DateRange;
   size?: number;
+  sortBy?: ShoesSortBy;
 }
 
 @Injectable()
@@ -64,6 +77,29 @@ export class ShoesService implements ICRUDService<Shoes> {
       query.andWhere('shoes.size = :size', { size: options.size });
     if (options.SKU)
       query.andWhere('shoes.SKU ILIKE :SKU', { SKU: `%${options.SKU}%` });
+    if (isDefined(options.sortBy)) {
+      if (isDefined(options.sortBy.sale))
+        query.addOrderBy(
+          'shoes.sale',
+          options.sortBy.sale,
+          options.sortBy.sale == 'ASC' ? 'NULLS FIRST' : 'NULLS LAST',
+        );
+    }
+    if (isDefined(options.sale)) {
+      query.andWhere('shoes.sale >= :fromSale', {
+        fromSale: options.sale.from,
+      });
+      if (options.sale.to)
+        query.andWhere('shoes.price <= :toSale', {
+          toSale: options.sale.to,
+        });
+    }
+    if (isDefined(options.dateCreated)) {
+      query.andWhere('shoes.createdAt between (:since) and (:to)', {
+        since: options.dateCreated.since,
+        to: options.dateCreated.to ?? dayjs().toDate(),
+      });
+    }
     return await query.getManyAndCount();
   }
   async update(value: Shoes): Promise<Shoes> {

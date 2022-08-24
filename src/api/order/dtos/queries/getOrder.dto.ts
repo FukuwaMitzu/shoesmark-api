@@ -12,7 +12,7 @@ import {
 import { Sort } from 'src/shared/enums/Sort.enum';
 import { OrderStatus } from '../../enums/orderStatus.enum';
 
-class OrderDto {
+class OrderSortBy {
   @ApiPropertyOptional({ enum: Sort, name: 'sortBy[dateCreated]' })
   @IsEnum(Sort)
   @IsOptional()
@@ -89,9 +89,9 @@ export class GetOrderDto {
   @IsOptional()
   status?: OrderStatus;
 
-  @ApiPropertyOptional({ type: OrderDto })
-  @Type(() => OrderDto)
+  @ApiPropertyOptional({ type: OrderSortBy })
+  @Type(() => OrderSortBy)
   @ValidateNested()
   @IsOptional()
-  sortBy?: OrderDto;
+  sortBy?: OrderSortBy;
 }
