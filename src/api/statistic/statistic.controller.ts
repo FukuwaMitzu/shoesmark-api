@@ -5,6 +5,7 @@ import { JsonEntity } from 'src/shared/JsonEntity';
 import { Authenticate } from '../auth/decorators/authenticate.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { GetGeneralDto } from './dtos/queries/getGeneral.dto';
+import { GetRenevueReportDto } from './dtos/queries/getRenevueReport';
 import { Duration } from './enums/Duration';
 import { StatisticService } from './statistic.service';
 
@@ -51,5 +52,13 @@ export class StatisticController {
         to.toDate(),
       ),
     });
+  }
+
+  @Get('report/renevue')
+  @Authenticate(Role.Admin, Role.Employee)
+  async getRenevueReport(@Query() getRenevueReportDto: GetRenevueReportDto) {
+    const date = dayjs(getRenevueReportDto.date).toDate();
+    const data = await this.statisticService.getRenevueReport(date);
+    return new JsonEntity(data);
   }
 }

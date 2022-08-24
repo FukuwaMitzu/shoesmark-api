@@ -71,6 +71,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-prettier", "virtual:67da80efdfb0d368447a1a0a17e9cd8bcd2849d03345d83fa6bb71a0717ebc075f58d1d23102136cb64fe526ce36455ccf70de9e5708ec70478cb799586fa8bd#npm:4.2.1"],\
             ["express", "npm:4.18.1"],\
             ["helmet", "npm:5.1.1"],\
+            ["imgbb-uploader", "npm:1.5.0"],\
             ["jest", "virtual:67da80efdfb0d368447a1a0a17e9cd8bcd2849d03345d83fa6bb71a0717ebc075f58d1d23102136cb64fe526ce36455ccf70de9e5708ec70478cb799586fa8bd#npm:28.1.2"],\
             ["jsonwebtoken", "npm:8.5.1"],\
             ["lodash", "npm:4.17.21"],\
@@ -6248,6 +6249,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["imgbb-uploader", [\
+        ["npm:1.5.0", {\
+          "packageLocation": "./.yarn/cache/imgbb-uploader-npm-1.5.0-11b0b46697-94fcb29f37.zip/node_modules/imgbb-uploader/",\
+          "packageDependencies": [\
+            ["imgbb-uploader", "npm:1.5.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["import-fresh", [\
         ["npm:3.3.0", {\
           "packageLocation": "./.yarn/cache/import-fresh-npm-3.3.0-3e34265ca9-2cacfad06e.zip/node_modules/import-fresh/",\
@@ -10362,6 +10372,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-prettier", "virtual:67da80efdfb0d368447a1a0a17e9cd8bcd2849d03345d83fa6bb71a0717ebc075f58d1d23102136cb64fe526ce36455ccf70de9e5708ec70478cb799586fa8bd#npm:4.2.1"],\
             ["express", "npm:4.18.1"],\
             ["helmet", "npm:5.1.1"],\
+            ["imgbb-uploader", "npm:1.5.0"],\
             ["jest", "virtual:67da80efdfb0d368447a1a0a17e9cd8bcd2849d03345d83fa6bb71a0717ebc075f58d1d23102136cb64fe526ce36455ccf70de9e5708ec70478cb799586fa8bd#npm:28.1.2"],\
             ["jsonwebtoken", "npm:8.5.1"],\
             ["lodash", "npm:4.17.21"],\

@@ -403,15 +403,8 @@ export class OrderController {
   @Get(':id')
   @Authenticate(Role.Admin, Role.Employee)
   async getOrderById(@Param() orderParamDto: OrderParamDto) {
-    const data = await this.orderService
-      .getPreBuiltFindAllQuery({
-        ids: [orderParamDto.id],
-        limit: 32,
-        sortBy: {},
-        offset: 0,
-      })
-      .getManyAndCount();
-    return new JsonEntity(data[0][0]);
+    const data = await this.orderService.findById(orderParamDto.id);
+    return new JsonEntity(data);
   }
 
   //Xoá đơn hàng của admin

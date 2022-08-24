@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import Big from 'big.js';
 import * as dayjs from 'dayjs';
 import { CategoryService } from '../category/category.service';
+import { OrderStatus } from '../order/enums/orderStatus.enum';
 import { OrderService } from '../order/order.service';
 import { UserService } from '../user/user.service';
 import { Duration } from './enums/Duration';
@@ -123,6 +124,7 @@ export class StatisticService {
       .getPreBuiltFindAllQuery({
         datePurchased: { since, to },
         isPaid: true,
+        excludeStatus: [OrderStatus.CANCELED],
       })
       .getMany();
     return result.reduce(
@@ -136,6 +138,7 @@ export class StatisticService {
       .getPreBuiltFindAllQuery({
         datePurchased: { since, to },
         isPaid: true,
+        excludeStatus: [OrderStatus.CANCELED],
       })
       .getMany();
     return result.reduce((pre, current) => {
@@ -155,12 +158,72 @@ export class StatisticService {
       .getRepository()
       .createQueryBuilder('order');
     const result = queryBuilder
-      .andWhere('order.datePurchased  BETWEEN :since AND :to', {
+      .andWhere('order.createdAt BETWEEN :since AND :to', {
         since: since,
         to: to ?? dayjs().toDate(),
       })
-      .andWhere('order.datePurchased IS NOT NULL')
+      .andWhere('order.status != :status', { status: 'canceled' })
       .getCount();
     return result;
+  }
+
+  async getRenevueReport(date: Date) {
+    const dateWrapper = dayjs(date);
+    const since = dateWrapper.startOf('month').toDate();
+    const to = dateWrapper.endOf('month').toDate();
+    const successOrder = await this.orderService
+      .getPreBuiltFindAllQuery({
+        isPaid: true,
+        excludeStatus: [OrderStatus.CANCELED],
+        datePurchased: { since, to },
+      })
+      .getManyAndCount();
+
+    const canceledOrder = await this.orderService
+      .getPreBuiltFindAllQuery({
+        isPaid: true,
+        status: OrderStatus.CANCELED,
+        datePurchased: { since, to },
+      })
+      .getManyAndCount();
+
+    const successOrderReport = {
+      totalOrder: successOrder[1],
+      renevue: successOrder[0].reduce((pre, current) => {
+        return new Big(current.totalPrice).plus(pre);
+      }, new Big(0)),
+      income: successOrder[0].reduce((pre, current) => {
+        const totalImportPrice = current.details.reduce(
+          (pre, detail) =>
+            new Big(detail.shoes.importPrice)
+              .mul(new Big(detail.quantity))
+              .plus(pre),
+          new Big(0),
+        );
+        return new Big(current.totalPrice).plus(pre).minus(totalImportPrice);
+      }, new Big(0)),
+    };
+
+    const canceledOrderReport = {
+      totalOrder: canceledOrder[1],
+      renevue: canceledOrder[0].reduce((pre, current) => {
+        return new Big(current.totalPrice).plus(pre);
+      }, new Big(0)),
+      income: canceledOrder[0].reduce((pre, current) => {
+        const totalImportPrice = current.details.reduce(
+          (pre, detail) =>
+            new Big(detail.shoes.importPrice)
+              .mul(new Big(detail.quantity))
+              .plus(pre),
+          new Big(0),
+        );
+        return new Big(current.totalPrice).plus(pre).minus(totalImportPrice);
+      }, new Big(0)),
+    };
+
+    return {
+      successOrderReport,
+      canceledOrderReport,
+    };
   }
 }

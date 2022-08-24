@@ -31,6 +31,7 @@ interface OrderFindAllOptions extends IFindAllOptions {
   createdAt?: { since: Date; to?: Date };
   datePurchased?: { since: Date; to?: Date };
   status?: OrderStatus;
+  excludeStatus?: OrderStatus[];
   isPaid?: boolean;
 }
 
@@ -42,19 +43,10 @@ export class OrderService implements ICRUDService<Order> {
   ) {}
 
   async findById(id: string): Promise<Order> {
-    return await this.orderRepository.findOne({
-      where: { orderId: id },
-      relations: {
-        owner: true,
-        details: {
-          shoes: {
-            brand: true,
-            color: true,
-            categories: true,
-          },
-        },
-      },
-    });
+    const data = await this.getPreBuiltFindAllQuery({
+      ids: [id],
+    }).getOne();
+    return data;
   }
 
   getPreBuiltFindAllQuery(
@@ -156,6 +148,11 @@ export class OrderService implements ICRUDService<Order> {
     if (options.status) {
       queryBD.andWhere('order.status = :status', { status: options.status });
     }
+    if (options.excludeStatus) {
+      queryBD.andWhere('order.status NOT IN (:...excludeStatus)', {
+        excludeStatus: options.excludeStatus,
+      });
+    }
     if (options.limit) queryBD.take(options.limit);
     if (options.offset) queryBD.skip(options.offset);
 
@@ -163,7 +160,8 @@ export class OrderService implements ICRUDService<Order> {
   }
 
   async findAll(options: OrderFindAllOptions): Promise<[Order[], number]> {
-    return await this.getPreBuiltFindAllQuery(options).getManyAndCount();
+    const data = await this.getPreBuiltFindAllQuery(options).getManyAndCount();
+    return data;
   }
   async update(value: Order): Promise<Order> {
     await this.orderRepository.save(value);

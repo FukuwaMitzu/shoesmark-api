@@ -30,11 +30,18 @@ import { isDefined } from 'class-validator';
 import { Category } from '../category/entities/category.entity';
 import { DeleteManyShoesDto } from './dtos/bodies/deleteManyShoes.dto';
 import { GetRelatedDto } from './dtos/queries/getRelated.dto';
-
+import { ConfigService } from '@nestjs/config';
+import * as imgbbUploader from 'imgbb-uploader';
 @ApiTags('Giày')
 @Controller('shoes')
 export class ShoesController {
-  constructor(private readonly shoesService: ShoesService) {}
+  constructor(
+    private readonly shoesService: ShoesService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  domain = this.configService.get('SHOESMARK_API_DOMAIN');
+  imgbbKey = this.configService.get('IMGBB_API_KEY');
 
   @Get()
   async getShoes(@Query() getShoesDto: GetShoesDto) {
@@ -67,6 +74,7 @@ export class ShoesController {
     const data = await this.shoesService.findById(shoesParamDto.id);
     return new JsonEntity(data);
   }
+
   @Post()
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('shoesImage'))
@@ -88,7 +96,16 @@ export class ShoesController {
     color.colorId = createShoesDto.colorId;
     shoes.color = color;
 
-    shoes.shoesImage = newPath.replace('\\', '/');
+    //Upload image
+    const data = await imgbbUploader({
+      apiKey: this.imgbbKey, // MANDATORY
+      imagePath: newPath, //pass a local file (max 32Mb)
+    });
+    shoes.shoesImage = data.url;
+    //Remove temp image file
+    fs.unlinkSync(newPath);
+
+    // shoes.shoesImage = `${this.domain}/${newPath.replace('\\', '/')}`;
 
     shoes.categories = createShoesDto.categories.map((categoryId) =>
       plainToInstance(Category, { categoryId: categoryId }),
@@ -126,7 +143,14 @@ export class ShoesController {
       const newPath = file.path + '.' + fileType;
       fs.renameSync(file.path, newPath);
 
-      shoes.shoesImage = newPath.replace('\\', '/');
+      //Upload image
+      const data = await imgbbUploader({
+        apiKey: this.imgbbKey, // MANDATORY
+        imagePath: newPath, //pass a local file (max 32Mb)
+      });
+      shoes.shoesImage = data.url;
+      fs.unlinkSync(newPath);
+      // shoes.shoesImage = `${this.domain}/${newPath.replace('\\', '/')}`;
     }
     await this.shoesService.update(shoes);
     return new JsonEntity(shoes);

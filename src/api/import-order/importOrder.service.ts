@@ -19,7 +19,7 @@ export class ImportOrderService implements ICRUDService<ImportOrder> {
     private readonly importOrderRepository: Repository<ImportOrder>,
   ) {}
   async findById(id: string): Promise<ImportOrder> {
-    return await this.importOrderRepository.findOne({
+    const result = await this.importOrderRepository.findOne({
       where: { importOrderId: id },
       relations: {
         creator: true,
@@ -28,6 +28,7 @@ export class ImportOrderService implements ICRUDService<ImportOrder> {
         },
       },
     });
+    return result;
   }
   async findAll(
     options: ImportOrderFindAllOptions,
@@ -45,7 +46,9 @@ export class ImportOrderService implements ICRUDService<ImportOrder> {
       queryBuilder.andWhere('creator.userId IN (:...creatorIds)', {
         creatorIds: options.creatorIds,
       });
-    return await queryBuilder.getManyAndCount();
+
+    const result = await queryBuilder.getManyAndCount();
+    return result;
   }
   async update(value: ImportOrder): Promise<ImportOrder> {
     await this.importOrderRepository.save(value);

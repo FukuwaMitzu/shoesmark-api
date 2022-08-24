@@ -1,10 +1,12 @@
 import { BadRequestException, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import { SharedShoesModule } from './shared/sharedShoes.module';
 import { ShoesController } from './shoes.controller';
 
 @Module({
   imports: [
+    ConfigModule,
     SharedShoesModule,
     MulterModule.register({
       dest: './uploads',
