@@ -75,10 +75,10 @@ import { StatisticModule } from './api/statistic/statistic.module';
       },
       inject: [ConfigService],
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads',
-    }),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..', 'uploads'),
+    //   serveRoot: '/uploads',
+    // }),
     ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
