@@ -16,12 +16,12 @@ export class RefreshToken {
   token: string;
 
   @CreateDateColumn({
-    type: 'timestamp',
+    type: 'timestamp with time zone',
   })
   createdAt: Date;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamp with time zone',
   })
   expiredAt: Date;
 }
